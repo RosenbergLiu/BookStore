@@ -21,13 +21,15 @@
                         <p>Stock: @book.stock.ToString()</p>
                     </div>
                     <div class="col">
-                        <button href="#" id="btnReserve" class="btn btn-primary">Reserve</button>
                         @if (book.stock == 0)
                         {
-                            <script type="text/javascript">
-                                document.getElementById('btnReserve').setAttribute('disabled', 'disabled')
-                            </script>
+                            <button href="#" id="btnReserve" class="btn btn-primary" disabled>Reserve</button>
                         }
+                        else
+                        {
+                            <button href="#" id="btnReserve" class="btn btn-primary">Reserve</button>
+                        }
+                        
                     </div>
                     
                 </div>

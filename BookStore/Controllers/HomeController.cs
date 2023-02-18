@@ -1,5 +1,6 @@
 ﻿using BookStore.Data;
 using BookStore.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
@@ -20,28 +21,37 @@ namespace BookStore.Controllers
 
         public async Task<IActionResult> Index()
         {
-            using (var bookContext = new BookContext())
+            ViewBag.books = new List<BookModel>();
+            var endpoint = _configuration["CosmosEndpoint"];
+            var key = _configuration["CosmosKey"];
+            if (endpoint != null && key != null)
             {
-                
-                if(bookContext.Books != null)
+                using (var bookContext = new BookContext(endpoint, key))
                 {
-                    ViewBag.books =await bookContext.Books.ToListAsync();
+                    if (bookContext.Books != null)
+                    {
+                        ViewBag.books = await bookContext.Books.ToListAsync();
 
+                    }
                 }
             }
 
 
 
 
+
             return View();
         }
 
-        public IActionResult Privacy()
+        [Authorize]
+        public async Task<IActionResult> Reserve()
         {
+
+
+
             return View();
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
