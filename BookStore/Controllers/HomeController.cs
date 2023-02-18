@@ -12,29 +12,31 @@ namespace BookStore.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _configuration;
         private readonly BookContext _bookContext;
-
-        public HomeController(ILogger<HomeController> logger, IConfiguration configuration, BookContext bookContext)
+        private readonly Dictionary<string, IList<Event>> _eventContext;
+        public HomeController(ILogger<HomeController> logger, IConfiguration configuration, BookContext bookContext, Dictionary<string, IList<Event>> eventContext)
         {
             _logger = logger;
             _configuration = configuration;
             _bookContext = bookContext;
+            _eventContext = eventContext;
         }
+
+        
+        public interface Event
+        {
+            public record Reserved(string BookId, int Quantity, DateTime DateTime, string UserId) : Event;
+            public record Returned(string BookId, int Quantity, DateTime DateTime, string UserId) : Event;
+        }
+
+
 
         public async Task<IActionResult> Index()
         {
             ViewBag.books = new List<BookModel>();
-                {
-                    if (_bookContext.Books != null)
-                    {
-                        ViewBag.books = await _bookContext.Books.ToListAsync();
-
-                    }
-                }
-            
-
-
-
-
+            if (_bookContext.Books != null)
+            {
+                ViewBag.books = await _bookContext.Books.ToListAsync();
+            }
 
             return View();
         }
@@ -42,9 +44,6 @@ namespace BookStore.Controllers
         [Authorize]
         public async Task<IActionResult> Reserve()
         {
-
-
-
             return View();
         }
 

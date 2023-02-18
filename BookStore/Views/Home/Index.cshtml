@@ -23,13 +23,12 @@
                     <div class="col">
                         @if (book.stock == 0)
                         {
-                            <button href="#" id="btnReserve" class="btn btn-primary" disabled>Reserve</button>
+                            <button href="#" id="btnReserve" class="btn btn-primary" asp-controller="Home" asp-action="Reserve" asp-route-id="@book.id" disabled>Reserve</button>
                         }
                         else
                         {
-                            <button href="#" id="btnReserve" class="btn btn-primary">Reserve</button>
+                            <button href="#" id="btnReserve" class="btn btn-primary" asp-controller="Home" asp-action="Reserve" asp-route-id="@book.id">Reserve</button>
                         }
-                        
                     </div>
                     
                 </div>
