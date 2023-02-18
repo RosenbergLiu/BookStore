@@ -1,9 +1,11 @@
 ﻿using BookStore.Data;
 using BookStore.Models;
+using BookStore.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+
 
 namespace BookStore.Controllers
 {
@@ -12,20 +14,13 @@ namespace BookStore.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _configuration;
         private readonly BookContext _bookContext;
-        private readonly Dictionary<string, IList<Event>> _eventContext;
+        private readonly Dictionary<string, IList<IEvent>> _eventContext;
         public HomeController(ILogger<HomeController> logger, IConfiguration configuration, BookContext bookContext, Dictionary<string, IList<Event>> eventContext)
         {
             _logger = logger;
             _configuration = configuration;
             _bookContext = bookContext;
             _eventContext = eventContext;
-        }
-
-        
-        public interface Event
-        {
-            public record Reserved(string BookId, int Quantity, DateTime DateTime, string UserId) : Event;
-            public record Returned(string BookId, int Quantity, DateTime DateTime, string UserId) : Event;
         }
 
 
