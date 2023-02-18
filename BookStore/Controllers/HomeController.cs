@@ -11,30 +11,26 @@ namespace BookStore.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _configuration;
+        private readonly BookContext _bookContext;
 
-
-        public HomeController(ILogger<HomeController> logger, IConfiguration configuration)
+        public HomeController(ILogger<HomeController> logger, IConfiguration configuration, BookContext bookContext)
         {
             _logger = logger;
             _configuration = configuration;
+            _bookContext = bookContext;
         }
 
         public async Task<IActionResult> Index()
         {
             ViewBag.books = new List<BookModel>();
-            var endpoint = _configuration["CosmosEndpoint"];
-            var key = _configuration["CosmosKey"];
-            if (endpoint != null && key != null)
-            {
-                using (var bookContext = new BookContext(endpoint, key))
                 {
-                    if (bookContext.Books != null)
+                    if (_bookContext.Books != null)
                     {
-                        ViewBag.books = await bookContext.Books.ToListAsync();
+                        ViewBag.books = await _bookContext.Books.ToListAsync();
 
                     }
                 }
-            }
+            
 
 
 

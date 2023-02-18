@@ -3,10 +3,26 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-// Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+// Connect to SQL as the event store database that only take write
+var connectionString = builder.Configuration.GetConnectionString("SqlConnection") ?? throw new InvalidOperationException("Connection string 'SqlConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
+
+
+// Connect to CosmosDB as the current state database that only take read
+var CosmosEndpoint = builder.Configuration.GetConnectionString("CosmosEndpoint") ?? throw new InvalidOperationException("Connection string 'CosmosEndpoint' not found.");
+var CosmosKey = builder.Configuration.GetConnectionString("CosmosKey") ?? throw new InvalidOperationException("Connection string 'CosmosKey' not found.");
+builder.Services.AddDbContext<BookContext>(options =>
+    options.UseCosmos(CosmosEndpoint, CosmosKey, "BookStore"));
+
+
+
+
+
+
+
+
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
