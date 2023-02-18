@@ -1,12 +1,11 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Browse Books";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Welcome to the book store</h1>
 </div>
-
+<br/>
 <!-- Book List -->
 <div class="row">
     @foreach (var book in ViewBag.BookList)
@@ -21,14 +20,7 @@
                         <p>Stock: @book.Stock.ToString()</p>
                     </div>
                     <div class="col">
-                        @if (book.Stock == 0)
-                        {
-                            <button type="button" id="btnReserve" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Modal" data-bs-title="@book.Title" data-bs-id="@book.id" disabled>Reserve</button>
-                        }
-                        else
-                        {
-                            <button type="button" id="btnReserve" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Modal" data-bs-title="@book.Title" data-bs-id="@book.id">Reserve</button>
-                        }
+                        <a class="btn btn-success" asp-area="" asp-controller="Home" asp-action="ReserveBook" asp-route-id="@book.id">Reserve</a>
                     </div>
                 </div>
             </div>
@@ -37,36 +29,8 @@
 </div>
 
 
-<!-- Modal -->
-<div class="modal fade" id="Modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" id="confirmReserve" class="btn btn-primary" asp-controller="Home" asp-action="Reserve">Save changes</button>
-            </div>
-        </div>
-    </div>
-</div>
-<script>
-    const Modal = document.getElementById('Modal')
-    
-    Modal.addEventListener('show.bs.modal', event => {
-        // Button that triggered the modal
-        const button = event.relatedTarget
-        // Extract info from data-bs-* attributes
-        const bookId = button.getAttribute('data-bs-id')
-        document.getElementById('confirmReserve').setAttribute("asp-route-id", bookId)
-        const bookTitle = button.getAttribute('data-bs-title')
-        const modalBody = Modal.querySelector('.modal-body')
-        modalBody.textContent = `Are you sure want to reserve [${bookTitle}]?`
-        
-    })
-</script>
+
+
+@ViewBag.Message
+
+

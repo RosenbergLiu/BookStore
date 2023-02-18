@@ -1,7 +1,7 @@
 ﻿@model BookStore.Models.UserModel
 
 @{
-    
+    ViewData["Title"] = "Reserved Books";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -26,11 +26,11 @@
                         <div class="col">
                             @if (book.Stock == 0)
                             {
-                                <button type="button" id="btnReserve" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Modal" data-bs-title="@book.Title" data-bs-id="@book.id" disabled>Reserve</button>
+                                <button id="btnReserve" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Modal" data-bs-title="@book.Title" data-bs-id="@book.id" disabled>Reserve</button>
                             }
                             else
                             {
-                                <button type="button" id="btnReserve" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Modal" data-bs-title="@book.Title" data-bs-id="@book.id">Reserve</button>
+                                <button id="btnReserve" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Modal" data-bs-title="@book.Title" data-bs-id="@book.id">Reserve</button>
                             }
                         </div>
                     </div>
@@ -38,4 +38,8 @@
             </div>
         }
     </div>
+}
+else
+{
+    
 }
