@@ -12,8 +12,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Connect to CosmosDB
 var CosmosEndpoint = builder.Configuration.GetConnectionString("CosmosEndpoint") ?? throw new InvalidOperationException("Connection string 'CosmosEndpoint' not found.");
 var CosmosKey = builder.Configuration.GetConnectionString("CosmosKey") ?? throw new InvalidOperationException("Connection string 'CosmosKey' not found.");
-builder.Services.AddDbContext<BookContext>(options =>
+builder.Services.AddDbContext<UserContext>(options =>
     options.UseCosmos(CosmosEndpoint, CosmosKey, "BookStore"));
+
+
+
+
+
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)

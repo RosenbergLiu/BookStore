@@ -1,37 +1,56 @@
 ﻿using BookStore.Data;
 using BookStore.Models;
-using BookStore.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
-
 
 namespace BookStore.Controllers
 {
     public class HomeController : Controller
     {
+
+
         private readonly ILogger<HomeController> _logger;
-        private readonly IConfiguration _configuration;
-        private readonly BookContext _bookContext;
-        private readonly Dictionary<string, IList<IEvent>> _eventContext;
-        public HomeController(ILogger<HomeController> logger, IConfiguration configuration, BookContext bookContext, Dictionary<string, IList<Event>> eventContext)
+        private readonly IConfiguration _configuration;//for accessing keys
+        private readonly UserContext _userContext;//for record the stock states of each users
+        private readonly UserManager<IdentityUser> _userManager;
+
+
+
+        public HomeController(
+            ILogger<HomeController> logger,
+            IConfiguration configuration,
+            UserContext userContext,
+            UserManager<IdentityUser> userManager
+            )
         {
             _logger = logger;
             _configuration = configuration;
-            _bookContext = bookContext;
-            _eventContext = eventContext;
+            _userContext = userContext;
+            _userManager = userManager;
         }
 
 
 
         public async Task<IActionResult> Index()
         {
-            ViewBag.books = new List<BookModel>();
-            if (_bookContext.Books != null)
+
+            var bookList = new List<BookModel>();
+            var store = await _userContext.Users.FirstOrDefaultAsync(u => u.id == "bookstore");
+            if (store != null)
             {
-                ViewBag.books = await _bookContext.Books.ToListAsync();
+                var books = store.Books;
+                if (books != null)
+                {
+                    foreach (var book in books)
+                    {
+                        bookList.Add(book);
+                    }
+                }
             }
+            ViewBag.BookList = bookList;
 
             return View();
         }

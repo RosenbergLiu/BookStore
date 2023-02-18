@@ -9,19 +9,19 @@
 
 
 <div class="row">
-    @foreach (var book in ViewBag.books)
+    @foreach (var book in ViewBag.BookList)
     {
         <div class="card" style="width: 18rem;">
             <img src="..." class="card-img-top" alt="...">
             <div class="card-body">
-                <h5 class="card-title">@book.title</h5>
-                <p class="card-text">@book.desc</p>
-                <div class="card-footer row align-items-start">
+                <h5 class="card-title">@book.Title</h5>
+                <p class="card-text">@book.Desc</p>
+                <div class="card-footer row align-items-end">
                     <div class="col">
-                        <p>Stock: @book.stock.ToString()</p>
+                        <p>Stock: @book.Stock.ToString()</p>
                     </div>
                     <div class="col">
-                        @if (book.stock == 0)
+                        @if (book.Stock == 0)
                         {
                             <button href="#" id="btnReserve" class="btn btn-primary" asp-controller="Home" asp-action="Reserve" asp-route-id="@book.id" disabled>Reserve</button>
                         }

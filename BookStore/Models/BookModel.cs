@@ -3,8 +3,8 @@
     public class BookModel
     {
         public string? id { get; set; }
-        public string? title { get; set; }
-        public string? desc { get; set; }
-        public int stock { get; set; }
+        public string? Title { get; set; }
+        public string? Desc { get; set; }
+        public int Stock { get; set; }
     }
 }
