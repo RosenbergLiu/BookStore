@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace BookStore.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
 
@@ -32,34 +34,55 @@ namespace BookStore.Controllers
             _userManager = userManager;
         }
 
-
-
+        [AllowAnonymous]
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
 
-            var bookList = new List<BookModel>();
+            ViewBag.BookList = new List<BookModel>();
             var store = await _userContext.Users.FirstOrDefaultAsync(u => u.id == "bookstore");
             if (store != null)
             {
-                var books = store.Books;
-                if (books != null)
-                {
-                    foreach (var book in books)
-                    {
-                        bookList.Add(book);
-                    }
-                }
+                ViewBag.BookList = store.Books;
             }
-            ViewBag.BookList = bookList;
 
             return View();
         }
 
-        [Authorize]
-        public async Task<IActionResult> Reserve()
+
+        [HttpGet]
+        public async Task<IActionResult> Reserved()
         {
-            return View();
+            var loggedUser = User.FindFirstValue(ClaimTypes.Name);
+            ViewBag.LoggedUser = loggedUser;
+            var user = await _userContext.Users.FirstOrDefaultAsync(u => u.id == loggedUser);
+            if(user != null)
+            {
+                return View(user);
+            }
+            else//if user stock record doesn't exist, create one with empty book list
+            {
+                UserModel newUser = new UserModel() {
+                    id = loggedUser,
+                    Books= new List<BookModel>()
+                };
+                await _userContext.Users.AddAsync(newUser);
+                await _userContext.SaveChangesAsync();
+                return RedirectToAction("Reserved");
+            }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> ReserveBook()
+        {
+
+
+
+
+            return RedirectToAction("index");
+        }
+
+
 
         public IActionResult Error()
         {

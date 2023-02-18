@@ -1,0 +1,41 @@
+﻿@model BookStore.Models.UserModel
+
+@{
+    
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@ViewBag.LoggedUser </h2>
+<h1>Reserved books:</h1>
+<br/>
+<!-- Book List -->
+@if (Model.Books!=null)
+{
+    <div class="row">
+        @foreach (var book in Model.Books)
+        {
+            <div class="card" style="width: 18rem;">
+                <img src="..." class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">@book.Title</h5>
+                    <p class="card-text">@book.Desc</p>
+                    <div class="card-footer row align-items-end">
+                        <div class="col">
+                            <p>Stock: @book.Stock.ToString()</p>
+                        </div>
+                        <div class="col">
+                            @if (book.Stock == 0)
+                            {
+                                <button type="button" id="btnReserve" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Modal" data-bs-title="@book.Title" data-bs-id="@book.id" disabled>Reserve</button>
+                            }
+                            else
+                            {
+                                <button type="button" id="btnReserve" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Modal" data-bs-title="@book.Title" data-bs-id="@book.id">Reserve</button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
