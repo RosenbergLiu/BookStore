@@ -1,8 +1,36 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Browse Books";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Welcome to the book store</h1>
 </div>
+<br/>
+<!-- Book List -->
+<div class="row">
+    @foreach (var book in ViewBag.BookList)
+    {
+        <div class="card" style="width: 18rem;">
+            <img src="..." class="card-img-top" alt="...">
+            <div class="card-body">
+                <h5 class="card-title">@book.Title</h5>
+                <p class="card-text">@book.Desc</p>
+                <div class="card-footer row align-items-end">
+                    <div class="col">
+                        <p>Stock: @book.Stock.ToString()</p>
+                    </div>
+                    <div class="col">
+                        <a class="btn btn-success" asp-area="" asp-controller="Home" asp-action="ReserveBook" asp-route-id="@book.id">Reserve</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+
+
+
+@ViewBag.Message
+
+
