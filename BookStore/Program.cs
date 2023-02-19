@@ -1,8 +1,10 @@
 using BookStore.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
+
 // Connect to Azure SQL
 var AzureSql = builder.Configuration.GetConnectionString("SqlConnection") ?? throw new InvalidOperationException("Connection string 'SqlConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -20,8 +22,6 @@ var CosmosEndpoint = builder.Configuration.GetConnectionString("CosmosEndpoint")
 var CosmosKey = builder.Configuration.GetConnectionString("CosmosKey") ?? throw new InvalidOperationException("Connection string 'CosmosKey' not found.");
 builder.Services.AddDbContext<UserContext>(options =>
     options.UseCosmos(CosmosEndpoint, CosmosKey, "BookStore"));
-
-
 
 
 

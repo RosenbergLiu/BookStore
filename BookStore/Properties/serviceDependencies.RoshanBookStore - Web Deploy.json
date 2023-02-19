@@ -1,14 +1,14 @@
 {
   "dependencies": {
     "mssql2": {
-      "secretStore": "LocalSecretsFile",
+      "secretStore": "AzureAppSettings",
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/xiangyu/databases/BookStore",
       "type": "mssql.azure",
       "connectionId": "ConnectionStrings:SqlConnection",
       "dynamicId": null
     },
     "cosmosdb1": {
-      "secretStore": "AzureKeyVault",
+      "secretStore": "AzureAppSettings",
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.DocumentDB/databaseAccounts/roshanliu",
       "type": "cosmosdb.azure",
       "connectionId": "ConnectionStrings:CosmosKey",
