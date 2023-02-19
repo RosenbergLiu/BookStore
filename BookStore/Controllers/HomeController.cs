@@ -8,11 +8,9 @@ using System.Security.Claims;
 
 namespace BookStore.Controllers
 {
-    [Authorize]
+
     public class HomeController : Controller
     {
-
-
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _configuration;//Keys
         private readonly UserContext _userContext;//Projections database
@@ -35,47 +33,71 @@ namespace BookStore.Controllers
         }
 
 
-
-
-        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-
-            ViewBag.BookList = new List<BookModel>();
             var store = await _userContext.Users.SingleOrDefaultAsync(u => u.id == "bookstore");
-            if (store != null)
+            return View(store.Books.ToList());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Index(string searchString)
+        {
+
+            var store = await _userContext.Users.SingleOrDefaultAsync(u => u.id == "bookstore");
+            var bookList = new List<BookModel>();
+            if (!String.IsNullOrEmpty(searchString))
             {
-                ViewBag.BookList = store.Books;
+                ViewBag.SearchString = $"Clear filer: '{searchString}'";
+                foreach (var book in store.Books)
+                {
+                    if (book.Title.Contains(searchString))
+                    {
+                        bookList.Add(book);
+                    }
+                }
+                return View(bookList.ToList());
+            }
+            else
+            {
+                return View(store.Books.ToList());
             }
 
-            return View();
         }
 
 
+
+
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> Reserved()
         {
             var user = await GetCurrentUser();
             return View(user);
         }
-
+        [Authorize]
         public async Task<IActionResult> ReserveBook(string id)
         {
-            await SaveEvent(id, 1);
-            await ApplyEventToStore(id, 1);
-            await ApplyEventToUser(id, 1);
-
+            ViewBag.ReserveReference = "aaaa";
+            await SaveEvent(id, 1);//save event to event database
+            await ApplyEventToStore(id, 1);//save store stock projection
+            await ApplyEventToUser(id, 1);//save user stock projection
             return RedirectToAction("index");
         }
 
 
-
-
-
+        [Authorize]
+        public async Task<IActionResult> ReturnBook(string id)
+        {
+            await SaveEvent(id, -1);
+            await ApplyEventToStore(id, -1);
+            await ApplyEventToUser(id, -1);
+            return RedirectToAction("Reserved");
+        }
 
 
         //Get current logged user's projection.
+        
         public async Task<UserModel?> GetCurrentUser()
         {
             var loggedUser = User.FindFirstValue(ClaimTypes.Name);
@@ -115,6 +137,11 @@ namespace BookStore.Controllers
             };
             await _eventContext.Events.AddAsync(newEvent);
             await _eventContext.SaveChangesAsync();
+            if (Quantity > 0)//Show dialog that give reserve reference
+            {
+                TempData["ResultMessage"] = newEvent.Id;
+            }
+
         }
         public async Task ApplyEventToStore(string BookId, int Quantity)
         {
@@ -134,7 +161,7 @@ namespace BookStore.Controllers
         public async Task ApplyEventToUser(string BookId, int Quantity)
         {
             var store = await _userContext.Users.SingleOrDefaultAsync(u => u.id == "bookstore");
-            
+
             var user = await GetCurrentUser();
             try
             {
@@ -164,19 +191,20 @@ namespace BookStore.Controllers
                     {
                         user.Books.Add(new BookModel()
                         {
-                            id= BookId,
+                            id = BookId,
                             Title = bookInStore.Title,
-                            Desc= bookInStore.Desc,
-                            Stock=Quantity
+                            Desc = bookInStore.Desc,
+                            Stock = Quantity
                         }
                         );
                     }
 
                 }
 
-                
+
                 await _userContext.SaveChangesAsync();
-            }catch(NullReferenceException e) { Error(e.Message); }
+            }
+            catch (NullReferenceException e) { Error(e.Message); }
         }
     }
 }
