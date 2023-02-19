@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace BookStore.Controllers
 {
-    [Authorize]
+    
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -31,7 +31,6 @@ namespace BookStore.Controllers
             _userContext = userContext;
             _eventContext = eventContext;
         }
-
 
         public async Task<IActionResult> Index(string searchString)
         {
@@ -58,21 +57,22 @@ namespace BookStore.Controllers
         }
 
 
-
+        [Authorize]
         public async Task<IActionResult> Reserved()
         {
             var user = await GetCurrentUser();
             return View(user);
         }
-        
+        [Authorize]
         public async Task<IActionResult> ReserveBook(string id)
         {
+            ViewBag.ReserveReference = "aaaa";
             await SaveEvent(id, 1);
             await ApplyEventToStore(id, 1);
             await ApplyEventToUser(id, 1);
             return RedirectToAction("index");
         }
-        
+        [Authorize]
         public async Task<IActionResult> ReturnBook(string id)
         {
             await SaveEvent(id, -1);
@@ -127,6 +127,11 @@ namespace BookStore.Controllers
             };
             await _eventContext.Events.AddAsync(newEvent);
             await _eventContext.SaveChangesAsync();
+            if(Quantity>0)
+            {
+                TempData["ResultMessage"] = newEvent.Id;
+            }
+            
         }
         public async Task ApplyEventToStore(string BookId, int Quantity)
         {
