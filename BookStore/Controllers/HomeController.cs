@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace BookStore.Controllers
 {
-    
+
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -43,7 +43,7 @@ namespace BookStore.Controllers
         [HttpPost]
         public async Task<IActionResult> Index(string searchString)
         {
-            
+
             var store = await _userContext.Users.SingleOrDefaultAsync(u => u.id == "bookstore");
             var bookList = new List<BookModel>();
             if (!String.IsNullOrEmpty(searchString))
@@ -62,15 +62,14 @@ namespace BookStore.Controllers
             {
                 return View(store.Books.ToList());
             }
-            
-        }
-        
 
+        }
 
 
 
 
         [Authorize]
+        [HttpGet]
         public async Task<IActionResult> Reserved()
         {
             var user = await GetCurrentUser();
@@ -80,11 +79,13 @@ namespace BookStore.Controllers
         public async Task<IActionResult> ReserveBook(string id)
         {
             ViewBag.ReserveReference = "aaaa";
-            await SaveEvent(id, 1);
-            await ApplyEventToStore(id, 1);
-            await ApplyEventToUser(id, 1);
+            await SaveEvent(id, 1);//save event to event database
+            await ApplyEventToStore(id, 1);//save store stock projection
+            await ApplyEventToUser(id, 1);//save user stock projection
             return RedirectToAction("index");
         }
+
+
         [Authorize]
         public async Task<IActionResult> ReturnBook(string id)
         {
@@ -95,12 +96,8 @@ namespace BookStore.Controllers
         }
 
 
-
-
-
-
-
         //Get current logged user's projection.
+        
         public async Task<UserModel?> GetCurrentUser()
         {
             var loggedUser = User.FindFirstValue(ClaimTypes.Name);
@@ -140,11 +137,11 @@ namespace BookStore.Controllers
             };
             await _eventContext.Events.AddAsync(newEvent);
             await _eventContext.SaveChangesAsync();
-            if(Quantity>0)
+            if (Quantity > 0)//Show dialog that give reserve reference
             {
                 TempData["ResultMessage"] = newEvent.Id;
             }
-            
+
         }
         public async Task ApplyEventToStore(string BookId, int Quantity)
         {
@@ -164,7 +161,7 @@ namespace BookStore.Controllers
         public async Task ApplyEventToUser(string BookId, int Quantity)
         {
             var store = await _userContext.Users.SingleOrDefaultAsync(u => u.id == "bookstore");
-            
+
             var user = await GetCurrentUser();
             try
             {
@@ -194,19 +191,20 @@ namespace BookStore.Controllers
                     {
                         user.Books.Add(new BookModel()
                         {
-                            id= BookId,
+                            id = BookId,
                             Title = bookInStore.Title,
-                            Desc= bookInStore.Desc,
-                            Stock=Quantity
+                            Desc = bookInStore.Desc,
+                            Stock = Quantity
                         }
                         );
                     }
 
                 }
 
-                
+
                 await _userContext.SaveChangesAsync();
-            }catch(NullReferenceException e) { Error(e.Message); }
+            }
+            catch (NullReferenceException e) { Error(e.Message); }
         }
     }
 }
