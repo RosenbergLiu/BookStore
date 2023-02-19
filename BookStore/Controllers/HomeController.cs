@@ -32,6 +32,15 @@ namespace BookStore.Controllers
             _eventContext = eventContext;
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> Index()
+        {
+            var store = await _userContext.Users.SingleOrDefaultAsync(u => u.id == "bookstore");
+            return View(store.Books.ToList());
+        }
+
+        [HttpPost]
         public async Task<IActionResult> Index(string searchString)
         {
             
@@ -55,6 +64,10 @@ namespace BookStore.Controllers
             }
             
         }
+        
+
+
+
 
 
         [Authorize]
