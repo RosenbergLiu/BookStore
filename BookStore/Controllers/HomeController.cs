@@ -1,9 +1,7 @@
 ﻿using BookStore.Data;
 using BookStore.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Security.Claims;
@@ -16,18 +14,18 @@ namespace BookStore.Controllers
 
 
         private readonly ILogger<HomeController> _logger;
-        private readonly IConfiguration _configuration;//for accessing keys
-        private readonly UserContext _userContext;//Projections
-        private readonly EventContext _eventContext;
+        private readonly IConfiguration _configuration;//Keys
+        private readonly UserContext _userContext;//Projections database
+        private readonly EventContext _eventContext;//Evnets database
 
-        
+
 
         public HomeController(
             ILogger<HomeController> logger,
             IConfiguration configuration,
             UserContext userContext,
             EventContext eventContext
-            
+
             )
         {
             _logger = logger;
@@ -35,6 +33,10 @@ namespace BookStore.Controllers
             _userContext = userContext;
             _eventContext = eventContext;
         }
+
+
+
+
         [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -60,7 +62,9 @@ namespace BookStore.Controllers
 
         public async Task<IActionResult> ReserveBook(string id)
         {
-            
+            await SaveEvent(id, 1);
+            await ApplyEvent(id, 1);
+
             return RedirectToAction("index");
         }
 
@@ -68,15 +72,14 @@ namespace BookStore.Controllers
 
 
 
-        ///Get current logged user's stock.
-        public async Task<UserModel> GetCurrentUser() {
+
+
+        //Get current logged user's projection.
+        public async Task<UserModel?> GetCurrentUser()
+        {
             var loggedUser = User.FindFirstValue(ClaimTypes.Name);
             var userStock = await _userContext.Users.SingleOrDefaultAsync(u => u.id == loggedUser);
-            if (userStock != null)
-            {
-                return userStock;
-            }
-            else
+            if (userStock == null)
             {
                 var newUser = new UserModel()
                 {
@@ -86,8 +89,8 @@ namespace BookStore.Controllers
                 await _userContext.Users.AddAsync(newUser);
                 await _userContext.SaveChangesAsync();
                 userStock = await _userContext.Users.SingleOrDefaultAsync(u => u.id == loggedUser);
-                return newUser;
             }
+            return userStock;
         }
 
         public IActionResult Error()
@@ -96,9 +99,22 @@ namespace BookStore.Controllers
         }
 
 
+        public async Task SaveEvent(string BookId, int Quantity)
+        {
 
-
-
+            //Save event to event database
+            var loggedUser = User.FindFirstValue(ClaimTypes.Name);
+            var newEvent = new EventModel()
+            {
+                Id = Guid.NewGuid(),
+                BookId = BookId,
+                Quantity = Quantity,
+                DateTime = DateTime.UtcNow,
+                UserId = loggedUser
+            };
+            await _eventContext.Events.AddAsync(newEvent);
+            await _eventContext.SaveChangesAsync();
+        }
 
     }
 }

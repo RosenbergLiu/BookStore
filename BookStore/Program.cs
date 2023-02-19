@@ -9,6 +9,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(AzureSql));
 
 
+builder.Services.AddDbContext<EventContext>(options =>
+    options.UseSqlServer(AzureSql));
+
+
+
+
 // Connect to CosmosDB
 var CosmosEndpoint = builder.Configuration.GetConnectionString("CosmosEndpoint") ?? throw new InvalidOperationException("Connection string 'CosmosEndpoint' not found.");
 var CosmosKey = builder.Configuration.GetConnectionString("CosmosKey") ?? throw new InvalidOperationException("Connection string 'CosmosKey' not found.");
