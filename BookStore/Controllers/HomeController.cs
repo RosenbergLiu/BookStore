@@ -8,11 +8,9 @@ using System.Security.Claims;
 
 namespace BookStore.Controllers
 {
-    
+    [Authorize]
     public class HomeController : Controller
     {
-
-
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _configuration;//Keys
         private readonly UserContext _userContext;//Projections database
@@ -35,31 +33,38 @@ namespace BookStore.Controllers
         }
 
 
-
-
-        
-        [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-
-            ViewBag.BookList = new List<BookModel>();
+            
             var store = await _userContext.Users.SingleOrDefaultAsync(u => u.id == "bookstore");
-            if (store != null)
+            var bookList = new List<BookModel>();
+            if (!String.IsNullOrEmpty(searchString))
             {
-                ViewBag.BookList = store.Books;
+                ViewBag.SearchString = $"Clear filer: '{searchString}'";
+                foreach (var book in store.Books)
+                {
+                    if (book.Title.Contains(searchString))
+                    {
+                        bookList.Add(book);
+                    }
+                }
+                return View(bookList.ToList());
             }
-
-            return View();
+            else
+            {
+                return View(store.Books.ToList());
+            }
+            
         }
 
-        [Authorize]
-        [HttpGet]
+
+
         public async Task<IActionResult> Reserved()
         {
             var user = await GetCurrentUser();
             return View(user);
         }
-        [Authorize]
+        
         public async Task<IActionResult> ReserveBook(string id)
         {
             await SaveEvent(id, 1);
@@ -67,7 +72,7 @@ namespace BookStore.Controllers
             await ApplyEventToUser(id, 1);
             return RedirectToAction("index");
         }
-        [Authorize]
+        
         public async Task<IActionResult> ReturnBook(string id)
         {
             await SaveEvent(id, -1);

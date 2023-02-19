@@ -1,14 +1,25 @@
-﻿@{
+﻿@model IEnumerable<BookModel>
+@{
     ViewData["Title"] = "Browse Books";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome to the book store</h1>
+    <h1 id="title" class="display-4">Welcome to the book store</h1>
 </div>
+<br/>
+
+
+<form asp-controller="Home" asp-action="Index">
+    <p>
+        Title: <input type="text" name="SearchString" />
+        <input type="submit" value="Filter" />
+    </p>
+</form>
+<a asp-controller="Home" asp-action="Index" asp-route-id="">@ViewBag.SearchString</a>
 <br/>
 <!-- Book List -->
 <div class="row">
-    @foreach (var book in ViewBag.BookList)
+    @foreach (var book in Model)
     {
         <div class="card" style="width: 18rem;">
             <img src="..." class="card-img-top" alt="...">
@@ -20,17 +31,12 @@
                         <p>Stock: @book.Stock.ToString()</p>
                     </div>
                     <div class="col">
-                        <a class="btn btn-success" asp-area="" asp-controller="Home" asp-action="ReserveBook" asp-route-id="@book.id">Reserve</a>
+                        <a class="btn btn-success" asp-area="" asp-controller="Home" asp-action="ReserveBook" asp-route-id="@book.id" onclick="return confirm('Are you sure you want reserve [@book.Title]?')">Reserve</a>
                     </div>
                 </div>
             </div>
         </div>
     }
 </div>
-
-
-
-
-@ViewBag.Message
 
 

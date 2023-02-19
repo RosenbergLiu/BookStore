@@ -5,8 +5,6 @@
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "VaultUri": "https://bookstore.vault.azure.net/",
-        "AZURE_USERNAME": "xygenio@hotmail.com"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5193"
@@ -16,8 +14,6 @@
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "VaultUri": "https://bookstore.vault.azure.net/",
-        "AZURE_USERNAME": "xygenio@hotmail.com"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7015;http://localhost:5193"
@@ -26,9 +22,7 @@
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "VaultUri": "https://bookstore.vault.azure.net/",
-        "AZURE_USERNAME": "xygenio@hotmail.com"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
     "Docker": {
@@ -38,8 +32,6 @@
       "publishAllPorts": true,
       "useSSL": true,
       "environmentVariables": {
-        "VaultUri": "https://bookstore.vault.azure.net/",
-        "AZURE_USERNAME": "xygenio@hotmail.com"
       }
     }
   },
