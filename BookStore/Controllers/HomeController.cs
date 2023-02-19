@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace BookStore.Controllers
 {
-    [Authorize]
+    
     public class HomeController : Controller
     {
 
@@ -37,7 +37,7 @@ namespace BookStore.Controllers
 
 
 
-        [AllowAnonymous]
+        
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -52,14 +52,14 @@ namespace BookStore.Controllers
             return View();
         }
 
-
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> Reserved()
         {
             var user = await GetCurrentUser();
             return View(user);
         }
-
+        [Authorize]
         public async Task<IActionResult> ReserveBook(string id)
         {
             await SaveEvent(id, 1);
@@ -67,7 +67,7 @@ namespace BookStore.Controllers
             await ApplyEventToUser(id, 1);
             return RedirectToAction("index");
         }
-
+        [Authorize]
         public async Task<IActionResult> ReturnBook(string id)
         {
             await SaveEvent(id, -1);
