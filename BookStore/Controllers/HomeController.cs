@@ -65,8 +65,15 @@ namespace BookStore.Controllers
             await SaveEvent(id, 1);
             await ApplyEventToStore(id, 1);
             await ApplyEventToUser(id, 1);
-
             return RedirectToAction("index");
+        }
+
+        public async Task<IActionResult> ReturnBook(string id)
+        {
+            await SaveEvent(id, -1);
+            await ApplyEventToStore(id, -1);
+            await ApplyEventToUser(id, -1);
+            return RedirectToAction("Reserved");
         }
 
 
