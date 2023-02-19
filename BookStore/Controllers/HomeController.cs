@@ -63,7 +63,8 @@ namespace BookStore.Controllers
         public async Task<IActionResult> ReserveBook(string id)
         {
             await SaveEvent(id, 1);
-            await ApplyEvent(id, 1);
+            await ApplyEventToStore(id, 1);
+            await ApplyEventToUser(id, 1);
 
             return RedirectToAction("index");
         }
@@ -93,9 +94,9 @@ namespace BookStore.Controllers
             return userStock;
         }
 
-        public IActionResult Error()
+        public IActionResult Error(string? Message)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier, Message = Message });
         }
 
 
@@ -108,13 +109,74 @@ namespace BookStore.Controllers
             {
                 Id = Guid.NewGuid(),
                 BookId = BookId,
-                Quantity = Quantity,
+                Quantity = -Quantity,
                 DateTime = DateTime.UtcNow,
                 UserId = loggedUser
             };
             await _eventContext.Events.AddAsync(newEvent);
             await _eventContext.SaveChangesAsync();
         }
+        public async Task ApplyEventToStore(string BookId, int Quantity)
+        {
+            var store = await _userContext.Users.SingleOrDefaultAsync(u => u.id == "bookstore");
+            var user = await GetCurrentUser();
+            try
+            {
+                var bookInStore = store.Books.SingleOrDefault(b => b.id == BookId);
+                bookInStore.Stock -= Quantity;
+                await _userContext.SaveChangesAsync();
+            }
+            catch (NullReferenceException e)
+            {
+                Error(e.Message);
+            }
+        }
+        public async Task ApplyEventToUser(string BookId, int Quantity)
+        {
+            var store = await _userContext.Users.SingleOrDefaultAsync(u => u.id == "bookstore");
+            
+            var user = await GetCurrentUser();
+            try
+            {
+                var bookInStore = store.Books.FirstOrDefault(b => b.id == BookId);
+                if (user.Books == null)
+                {
+                    user.Books = new List<BookModel>()
+                    {
+                        new BookModel()
+                        {
+                            id= BookId,
+                            Title= bookInStore.Title,
+                            Desc= bookInStore.Desc,
+                            Stock=Quantity
+                        }
+                    };
+                }
+                else
+                {
+                    var bookInUser = user.Books.SingleOrDefault(b => b.id == BookId);
+                    if (bookInUser != null)
+                    {
+                        bookInUser.Stock += Quantity;
 
+                    }
+                    else
+                    {
+                        user.Books.Add(new BookModel()
+                        {
+                            id= BookId,
+                            Title = bookInStore.Title,
+                            Desc= bookInStore.Desc,
+                            Stock=Quantity
+                        }
+                        );
+                    }
+
+                }
+
+                
+                await _userContext.SaveChangesAsync();
+            }catch(NullReferenceException e) { Error(e.Message); }
+        }
     }
 }
